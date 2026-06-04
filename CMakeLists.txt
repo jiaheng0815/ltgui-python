@@ -11,7 +11,16 @@ find_package(Python COMPONENTS Interpreter Development REQUIRED)
 find_package(pybind11 REQUIRED)
 
 # ---- Paths to ltgui C++ library ----
-set(LTGUI_ROOT "D:/code/ltgui")
+# Set LTGUI_ROOT via -D or as env var. Default: sibling ../ltgui
+if(NOT DEFINED LTGUI_ROOT)
+    if(DEFINED ENV{LTGUI_ROOT})
+        set(LTGUI_ROOT "$ENV{LTGUI_ROOT}")
+    else()
+        set(LTGUI_ROOT "${CMAKE_SOURCE_DIR}/../ltgui")
+    endif()
+endif()
+message(STATUS "LTGUI_ROOT = ${LTGUI_ROOT}")
+
 set(LTGUI_INCLUDE_DIR "${LTGUI_ROOT}/include")
 set(LTGUI_VENDOR_DIR "${LTGUI_ROOT}/vendor")
 set(LTGUI_LIB_DIR "${LTGUI_ROOT}/build/lib")
