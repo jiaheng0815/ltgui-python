@@ -12,7 +12,7 @@ BUILD_DIR = os.path.join(SCRIPT_DIR, "build")
 # ---- LTGUI_ROOT resolution ----
 # Search order: 1) --ltgui-root flag  2) LTGUI_ROOT env var
 #               3) ../ltgui sibling   4) ../../ltgui
-#               5) D:/code/ltgui (fallback, prints warning)
+# (no hardcoded fallback — user must set --ltgui-root or LTGUI_ROOT)
 
 def _find_ltgui_root(explicit=None):
     """Resolve the path to the ltgui C++ library."""
@@ -33,17 +33,11 @@ def _find_ltgui_root(explicit=None):
     # 4) Grandparent ../../ltgui (if this repo is nested)
     candidates.append(os.path.join(SCRIPT_DIR, "..", "..", "ltgui"))
 
-    # 5) Legacy fallback
-    candidates.append("D:/code/ltgui")
-
     for c in candidates:
         c = os.path.normpath(os.path.abspath(c))
         ltgui_py = os.path.join(c, "ltgui.py")
         include_dir = os.path.join(c, "include")
         if os.path.isfile(ltgui_py) and os.path.isdir(include_dir):
-            if c == candidates[-1]:
-                cprint(f"WARNING: using fallback path {c}", "yellow")
-                cprint("  Set LTGUI_ROOT env var or use --ltgui-root to override.", "yellow")
             return c
 
     cprint("Error: could not find ltgui C++ library.", "red", bold=True)
@@ -189,8 +183,8 @@ def print_usage():
     print("Options:")
     print("  --ltgui-root <path>   Path to ltgui C++ library (default: auto-detect)")
     print()
-    print("ltgui root is auto-detected from: ../ltgui, ../../ltgui, LTGUI_ROOT env var")
-    print("or --ltgui-root flag. Falls back to D:/code/ltgui with a warning.")
+    print("ltgui root is auto-detected from: --ltgui-root flag, LTGUI_ROOT env var,")
+    print("../ltgui sibling, or ../../ltgui grandparent directory.")
     print()
     print("For pip install:   pip install .")
     print("For editable dev:  python setup.py develop")

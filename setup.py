@@ -23,11 +23,11 @@ from setuptools.command.build_ext import build_ext
 
 def find_ltgui_root():
     """Find ltgui C++ library root directory."""
+    this_dir = os.path.dirname(os.path.abspath(__file__))
     candidates = [
         os.environ.get("LTGUI_ROOT"),
-        os.path.join(os.path.dirname(__file__), "..", "ltgui"),
-        os.path.join(os.path.dirname(__file__), "..", "..", "ltgui"),
-        "D:/code/ltgui",
+        os.path.join(this_dir, "..", "ltgui"),
+        os.path.join(this_dir, "..", "..", "ltgui"),
     ]
     for c in candidates:
         if not c:
@@ -36,12 +36,11 @@ def find_ltgui_root():
         if os.path.isfile(os.path.join(c, "ltgui.py")) and os.path.isdir(
             os.path.join(c, "include")
         ):
-            if c == candidates[-1]:
-                print(f"[ltgui] WARNING: using fallback path {c}")
             return c
+    tried = "\n  ".join(c for c in candidates if c)
     raise RuntimeError(
-        "Could not find ltgui C++ library.\n"
-        "Set LTGUI_ROOT environment variable.\n"
+        f"Could not find ltgui C++ library. Tried:\n  {tried}\n\n"
+        "Set LTGUI_ROOT environment variable or place ltgui-python next to ltgui.\n"
         "Clone: git clone https://github.com/jiaheng0815/ltgui.git"
     )
 

@@ -1,0 +1,168 @@
+Metadata-Version: 2.4
+Name: ltgui
+Version: 0.1.0
+Summary: Python bindings for ltgui — cross-platform retained-mode GUI framework
+Author-email: jiaheng0815 <jiaheng0815@users.noreply.github.com>
+License: MIT
+Project-URL: Homepage, https://github.com/jiaheng0815/ltgui
+Project-URL: Repository, https://github.com/jiaheng0815/ltgui-python
+Project-URL: Issues, https://github.com/jiaheng0815/ltgui-python/issues
+Keywords: gui,cross-platform,retained-mode,widget,desktop
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Classifier: Programming Language :: C++
+Classifier: Topic :: Software Development :: User Interfaces
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+
+# ltgui-python
+
+Python bindings for [ltgui](https://github.com/jiaheng0815/ltgui) — a from-scratch, cross-platform retained-mode C++17 GUI framework.
+基于 [ltgui](https://github.com/jiaheng0815/ltgui) 的 Python 绑定——从零构建的跨平台保留模式 C++17 GUI 框架。
+
+[English](#english) | [中文](#中文)
+
+---
+
+# English
+
+## Install
+
+```bash
+# Prerequisites
+pip install pybind11
+
+# Build (requires ltgui cloned next to this repo, or set LTGUI_ROOT)
+git clone https://github.com/jiaheng0815/ltgui-python.git
+cd ltgui-python
+python build.py build
+```
+
+## Quick Start
+
+```python
+import ltgui
+
+def main(window):
+    window.set_title("Hello ltgui")
+    root = ltgui.Widget()
+    root.style().bg_color = ltgui.White
+
+    label = ltgui.make_child(root, ltgui.Label, "Welcome to ltgui!")
+    btn = ltgui.make_child(root, ltgui.Button, "Click Me!")
+    btn.on_click(lambda: btn.set_text("Clicked!"))
+
+    layout = ltgui.BoxLayout(ltgui.Direction.TopToBottom, 8, 12)
+    root.set_layout(layout)
+    window.set_central_widget(root)
+
+ltgui.run(main)
+```
+
+## API Coverage
+
+| Category | Classes |
+|----------|---------|
+| Value Types | Point, Size, Rect, Color, Font, FontWeight, FontStyle, Style, Event |
+| Theme | Theme (Light/Dark), current_theme()/set_theme() |
+| Enums | WidgetType, EventType, MouseButton, Key, KeyModifier, CursorShape, Easing, Direction |
+| Layout | BoxLayout (LeftToRight/TopToBottom), GridLayout |
+| Timer | Timer (start/stop/single_shot) |
+| Core | Application (singleton), Window, Shortcut |
+
+**14 Widgets:** Widget, Button, Label, TextBox, CheckBox, RadioButton, Slider, ListBox, ComboBox, ProgressBar, TabWidget, Image, ScrollArea
+
+## Commands
+
+```bash
+python build.py build          # Build _ltgui.pyd
+python build.py run hello      # Build + run examples/hello.py
+python build.py run demo       # Build + run examples/demo.py
+python build.py clean          # Remove build/ and .pyd
+```
+
+## Requirements
+
+- Python 3.8+
+- pybind11 3.0+
+- [ltgui](https://github.com/jiaheng0815/ltgui) cloned next to this repo (auto-detected)
+- Windows: clang++ (LLVM) + Ninja
+
+---
+
+# 中文
+
+## 安装
+
+```bash
+# 前置
+pip install pybind11
+
+# 编译（需要 ltgui clone 在相邻目录，或设置 LTGUI_ROOT）
+git clone https://github.com/jiaheng0815/ltgui-python.git
+cd ltgui-python
+python build.py build
+```
+
+## 快速开始
+
+```python
+import ltgui
+
+def main(window):
+    window.set_title("Hello ltgui")
+    root = ltgui.Widget()
+    root.style().bg_color = ltgui.White
+
+    label = ltgui.make_child(root, ltgui.Label, "Welcome to ltgui!")
+    btn = ltgui.make_child(root, ltgui.Button, "Click Me!")
+    btn.on_click(lambda: btn.set_text("Clicked!"))
+
+    layout = ltgui.BoxLayout(ltgui.Direction.TopToBottom, 8, 12)
+    root.set_layout(layout)
+    window.set_central_widget(root)
+
+ltgui.run(main)
+```
+
+## API 覆盖
+
+| 类别 | 类 |
+|------|-----|
+| 值类型 | Point, Size, Rect, Color, Font, FontWeight, FontStyle, Style, Event |
+| 主题 | Theme (Light/Dark), current_theme()/set_theme() |
+| 枚举 | WidgetType, EventType, MouseButton, Key, KeyModifier, CursorShape, Easing, Direction |
+| 布局 | BoxLayout (LeftToRight/TopToBottom), GridLayout |
+| 计时器 | Timer (start/stop/single_shot) |
+| 核心 | Application (单例), Window, Shortcut |
+
+**14 个控件:** Widget, Button, Label, TextBox, CheckBox, RadioButton, Slider, ListBox, ComboBox, ProgressBar, TabWidget, Image, ScrollArea
+
+## 命令
+
+```bash
+python build.py build          # 编译 _ltgui.pyd
+python build.py run hello      # 编译 + 运行 examples/hello.py
+python build.py run demo       # 编译 + 运行 examples/demo.py
+python build.py clean          # 清理 build/ 和 .pyd
+```
+
+## 依赖
+
+- Python 3.8+
+- pybind11 3.0+
+- [ltgui](https://github.com/jiaheng0815/ltgui) 已 clone 在相邻目录（自动检测）
+- Windows: clang++ (LLVM) + Ninja
