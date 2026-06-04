@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=64", "pybind11>=3.0", "cmake>=3.18"]
+requires = ["setuptools>=64", "pybind11>=3.0", "cmake>=3.18", "ninja"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,7 +7,7 @@ name = "ltgui"
 version = "0.1.0"
 description = "Python bindings for ltgui — cross-platform retained-mode GUI framework"
 readme = "README.md"
-license = {text = "MIT"}
+license = "MIT"
 requires-python = ">=3.8"
 authors = [
     {name = "jiaheng0815", email = "jiaheng0815@users.noreply.github.com"},
@@ -16,7 +16,6 @@ keywords = ["gui", "cross-platform", "retained-mode", "widget", "desktop"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: Microsoft :: Windows",
     "Operating System :: POSIX :: Linux",
     "Operating System :: MacOS :: MacOS X",
