@@ -15,7 +15,7 @@ Python bindings for [ltgui](https://github.com/jiaheng0815/ltgui) — a from-scr
 # Prerequisites
 pip install pybind11
 
-# Build (requires ltgui at D:/code/ltgui)
+# Build (requires ltgui cloned next to this repo, or set LTGUI_ROOT)
 git clone https://github.com/jiaheng0815/ltgui-python.git
 cd ltgui-python
 python build.py build
@@ -68,7 +68,7 @@ python build.py clean          # Remove build/ and .pyd
 
 - Python 3.8+
 - pybind11 3.0+
-- [ltgui](https://github.com/jiaheng0815/ltgui) built at `D:/code/ltgui`
+- [ltgui](https://github.com/jiaheng0815/ltgui) cloned next to this repo (auto-detected)
 - Windows: clang++ (LLVM) + Ninja
 
 ---
@@ -81,7 +81,7 @@ python build.py clean          # Remove build/ and .pyd
 # 前置
 pip install pybind11
 
-# 编译（需要 ltgui 位于 D:/code/ltgui）
+# 编译（需要 ltgui clone 在相邻目录，或设置 LTGUI_ROOT）
 git clone https://github.com/jiaheng0815/ltgui-python.git
 cd ltgui-python
 python build.py build
@@ -134,5 +134,5 @@ python build.py clean          # 清理 build/ 和 .pyd
 
 - Python 3.8+
 - pybind11 3.0+
-- [ltgui](https://github.com/jiaheng0815/ltgui) 已编译于 `D:/code/ltgui`
+- [ltgui](https://github.com/jiaheng0815/ltgui) 已 clone 在相邻目录（自动检测）
 - Windows: clang++ (LLVM) + Ninja
