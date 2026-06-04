@@ -1,0 +1,102 @@
+name: Build & Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  release:
+    types: [published]
+
+jobs:
+  # ---- Unit tests (no GUI) ----
+  test:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Clone ltgui
+        run: |
+          git clone https://github.com/jiaheng0815/ltgui.git ../ltgui
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install pybind11 ninja pytest
+
+      - name: Build ltgui C++ library
+        run: |
+          cd ../ltgui
+          python ltgui.py build
+
+      - name: Build ltgui-python
+        run: |
+          python build.py build
+
+      - name: Run unit tests
+        run: |
+          pytest tests/ -v
+
+  # ---- Wheel builds (on release) ----
+  build-wheels:
+    if: github.event_name == 'release'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Clone ltgui
+        run: |
+          git clone https://github.com/jiaheng0815/ltgui.git ../ltgui
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Build ltgui C++ library
+        run: |
+          cd ../ltgui
+          python ltgui.py build
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.21
+        env:
+          CIBW_BUILD: "cp38-* cp39-* cp310-* cp311-* cp312-* cp313-* cp314-*"
+          CIBW_SKIP: "*-musllinux* *-win32"
+          CIBW_BEFORE_BUILD: "pip install pybind11 ninja"
+          CIBW_ENVIRONMENT: "LTGUI_ROOT=${{ github.workspace }}/../ltgui"
+          CIBW_TEST_COMMAND: "pytest {project}/tests -v"
+          CIBW_TEST_REQUIRES: "pytest"
+
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.os }}
+          path: wheelhouse/*.whl
+
+  # ---- Publish to PyPI (on release) ----
+  publish:
+    needs: build-wheels
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: wheels-*
+          merge-multiple: true
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}

@@ -11,7 +11,6 @@ find_package(Python COMPONENTS Interpreter Development REQUIRED)
 find_package(pybind11 REQUIRED)
 
 # ---- Paths to ltgui C++ library ----
-# Set LTGUI_ROOT via -D or as env var. Default: sibling ../ltgui
 if(NOT DEFINED LTGUI_ROOT)
     if(DEFINED ENV{LTGUI_ROOT})
         set(LTGUI_ROOT "$ENV{LTGUI_ROOT}")
@@ -23,7 +22,15 @@ message(STATUS "LTGUI_ROOT = ${LTGUI_ROOT}")
 
 set(LTGUI_INCLUDE_DIR "${LTGUI_ROOT}/include")
 set(LTGUI_VENDOR_DIR "${LTGUI_ROOT}/vendor")
-set(LTGUI_LIB_DIR "${LTGUI_ROOT}/build/lib")
+
+# ---- Static library name varies by platform ----
+if(WIN32)
+    set(LTGUI_LIB "${LTGUI_ROOT}/build/lib/ltgui.lib")
+elseif(APPLE)
+    set(LTGUI_LIB "${LTGUI_ROOT}/build/lib/libltgui.a")
+else()
+    set(LTGUI_LIB "${LTGUI_ROOT}/build/lib/libltgui.a")
+endif()
 
 # ---- The binding module ----
 pybind11_add_module(_ltgui src/_ltgui.cpp)
@@ -34,21 +41,38 @@ target_include_directories(_ltgui PRIVATE
     ${LTGUI_VENDOR_DIR}
 )
 
-target_link_libraries(_ltgui PRIVATE
-    ${LTGUI_LIB_DIR}/ltgui.lib
-    gdi32 gdiplus user32 comctl32 ole32 imm32
-    d3d11 dxgi d3dcompiler
-)
+target_link_libraries(_ltgui PRIVATE ${LTGUI_LIB})
 
-target_link_options(_ltgui PRIVATE -static)
+# ---- Platform-specific libraries ----
+if(WIN32)
+    target_compile_definitions(_ltgui PRIVATE
+        _UNICODE UNICODE NOMINMAX
+    )
+    target_link_libraries(_ltgui PRIVATE
+        gdi32 gdiplus user32 comctl32 ole32 imm32
+        d3d11 dxgi d3dcompiler
+    )
+    target_link_options(_ltgui PRIVATE -static)
+elseif(APPLE)
+    target_compile_definitions(_ltgui PRIVATE LTGUI_PLATFORM_MACOS)
+    target_link_libraries(_ltgui PRIVATE
+        "-framework Cocoa"
+        "-framework CoreGraphics"
+        "-framework CoreText"
+    )
+else()
+    target_compile_definitions(_ltgui PRIVATE LTGUI_PLATFORM_LINUX)
+    target_link_libraries(_ltgui PRIVATE
+        X11 Xft Xrender fontconfig EGL GLESv2
+    )
+    find_package(Freetype)
+    if(FREETYPE_FOUND)
+        target_include_directories(_ltgui PRIVATE ${FREETYPE_INCLUDE_DIRS})
+        target_link_libraries(_ltgui PRIVATE ${FREETYPE_LIBRARIES})
+    endif()
+endif()
 
-target_compile_definitions(_ltgui PRIVATE
-    _UNICODE
-    UNICODE
-    NOMINMAX
-)
-
-# Copy output .pyd to ltgui/ package directory
+# Copy output .pyd/.so to ltgui/ package directory
 add_custom_command(TARGET _ltgui POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "$<TARGET_FILE:_ltgui>"

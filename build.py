@@ -183,6 +183,7 @@ def print_usage():
     print("Commands:")
     print("  build            Build the _ltgui.pyd binding module")
     print("  run <name>       Build and run an example from examples/")
+    print("  test             Run unit tests (pytest required)")
     print("  clean            Remove build/ and .pyd files")
     print()
     print("Options:")
@@ -190,6 +191,9 @@ def print_usage():
     print()
     print("ltgui root is auto-detected from: ../ltgui, ../../ltgui, LTGUI_ROOT env var")
     print("or --ltgui-root flag. Falls back to D:/code/ltgui with a warning.")
+    print()
+    print("For pip install:   pip install .")
+    print("For editable dev:  python setup.py develop")
 
 
 def parse_args(argv):
@@ -227,6 +231,14 @@ def main():
         cmd_build()
     elif positional[0] == "run":
         cmd_run(positional)
+    elif positional[0] == "test":
+        cmd_build()
+        env = os.environ.copy()
+        env["PYTHONPATH"] = SCRIPT_DIR
+        import pytest
+        test_dir = os.path.join(SCRIPT_DIR, "tests")
+        sys.exit(pytest.main([test_dir, "-v"]))
+
     elif positional[0] == "clean":
         cmd_clean()
     else:

@@ -251,13 +251,13 @@ PYBIND11_MODULE(_ltgui, m) {
         .value("ImeComposition", EventType::ImeComposition);
 
     py::enum_<MouseButton>(m, "MouseButton")
-        .value("None", MouseButton::None)
+        .value("NoButton", MouseButton::None)
         .value("Left", MouseButton::Left)
         .value("Right", MouseButton::Right)
         .value("Middle", MouseButton::Middle);
 
     py::enum_<KeyModifier>(m, "KeyModifier")
-        .value("None", KeyModifier::None)
+        .value("NoModifier", KeyModifier::None)
         .value("Shift", KeyModifier::Shift)
         .value("Control", KeyModifier::Control)
         .value("Alt", KeyModifier::Alt);
@@ -412,7 +412,7 @@ PYBIND11_MODULE(_ltgui, m) {
         .def("register_shortcut", &Window::registerShortcut)
         .def("set_central_widget", [](Window& w, Widget* widget) {
             w.setCentralWidget(std::unique_ptr<Widget>(widget));
-        }, py::arg("widget"))
+        }, py::arg("widget"), py::keep_alive<1, 0>())  // window keeps widget alive
         .def("central_widget", &Window::centralWidget,
              py::return_value_policy::reference)
         .def("update", &Window::update);
@@ -428,7 +428,7 @@ PYBIND11_MODULE(_ltgui, m) {
         .def_property_readonly("parent", &Widget::parent, py::return_value_policy::reference)
         .def("add_child", [](Widget& self, Widget* child) {
             self.addChild(std::unique_ptr<Widget>(child));
-        }, py::arg("child"))
+        }, py::arg("child"), py::keep_alive<1, 0>())  // parent keeps child alive
         .def("remove_child", [](Widget& self, Widget* child) {
             auto ptr = self.removeChild(child);
             if (ptr) ptr.release(); // give ownership back to Python
@@ -452,7 +452,7 @@ PYBIND11_MODULE(_ltgui, m) {
         // Layout
         .def("set_layout", [](Widget& w, Layout* layout) {
             w.setLayout(std::unique_ptr<Layout>(layout));
-        })
+        }, py::arg("layout"), py::keep_alive<1, 0>())  // widget keeps layout alive
         // Style — return writable reference so Python can modify in-place
         .def("style", py::overload_cast<>(&Widget::style),
              py::return_value_policy::reference)
@@ -466,7 +466,11 @@ PYBIND11_MODULE(_ltgui, m) {
         // Painting
         .def("update", [](Widget& w) { w.update(); })
         // Events
-        .def("handle_event", &Widget::handleEvent)
+        .def("handle_event", &Widget::handleEvent, py::arg("event"),
+             "Handle an event. Returns True if consumed.\n"
+             "Override in Python subclasses for custom behavior.\n"
+             "Event types: MouseDown, MouseUp, MouseMove, MouseWheel, "
+             "KeyDown, KeyUp, FocusIn, FocusOut, ImeComposition.")
         .def("widget_type", &Widget::widgetType)
         .def("can_accept_focus", &Widget::canAcceptFocus)
         // Window
@@ -597,7 +601,7 @@ PYBIND11_MODULE(_ltgui, m) {
         .def(py::init<Widget*>(), py::arg("parent")=nullptr)
         .def("set_widget", [](ScrollArea& sa, Widget* widget) {
             sa.setWidget(std::unique_ptr<Widget>(widget));
-        }, py::arg("widget"))
+        }, py::arg("widget"), py::keep_alive<1, 0>())
         .def("widget", &ScrollArea::widget, py::return_value_policy::reference);
 
     // ========================================================================

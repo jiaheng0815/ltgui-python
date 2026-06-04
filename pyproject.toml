@@ -1,9 +1,67 @@
 [build-system]
-requires = ["pybind11>=3.0"]
+requires = ["setuptools>=64", "pybind11>=3.0", "cmake>=3.18"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "ltgui"
 version = "0.1.0"
 description = "Python bindings for ltgui — cross-platform retained-mode GUI framework"
+readme = "README.md"
+license = {text = "MIT"}
 requires-python = ">=3.8"
+authors = [
+    {name = "jiaheng0815", email = "jiaheng0815@users.noreply.github.com"},
+]
+keywords = ["gui", "cross-platform", "retained-mode", "widget", "desktop"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS :: MacOS X",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: C++",
+    "Topic :: Software Development :: User Interfaces",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.urls]
+Homepage = "https://github.com/jiaheng0815/ltgui"
+Repository = "https://github.com/jiaheng0815/ltgui-python"
+Issues = "https://github.com/jiaheng0815/ltgui-python/issues"
+
+[tool.setuptools]
+packages = ["ltgui"]
+
+[tool.setuptools.cmake]
+build-type = "Release"
+
+[tool.cibuildwheel]
+build = "cp38-* cp39-* cp310-* cp311-* cp312-* cp313-* cp314-*"
+skip = "*-musllinux* *-win32 *-manylinux_i686"
+test-command = "pytest {project}/tests -v"
+test-requires = ["pytest"]
+
+[tool.cibuildwheel.windows]
+before-build = "pip install pybind11 cmake ninja"
+archs = ["AMD64"]
+
+[tool.cibuildwheel.linux]
+before-build = "pip install pybind11 cmake ninja"
+repair-wheel-command = "auditwheel repair -w {dest_dir} {wheel}"
+
+[tool.cibuildwheel.macos]
+before-build = "pip install pybind11 cmake ninja"
+archs = ["x86_64", "arm64"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
