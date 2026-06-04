@@ -14,10 +14,12 @@ jobs:
     runs-on: windows-latest
     strategy:
       fail-fast: false
+    env:
+      LTGUI_ROOT: ${{ github.workspace }}/../ltgui
     steps:
       - uses: actions/checkout@v4
 
-      - name: Clone ltgui
+      - name: Clone ltgui C++ library
         run: |
           git clone https://github.com/jiaheng0815/ltgui.git ../ltgui
 
@@ -31,13 +33,13 @@ jobs:
           pip install pybind11 ninja pytest
 
       - name: Build ltgui C++ library
+        working-directory: ../ltgui
         run: |
-          cd ../ltgui
           python ltgui.py build
 
-      - name: Build ltgui-python
+      - name: Build ltgui-python bindings
         run: |
-          python build.py build
+          python build.py build --ltgui-root $env:LTGUI_ROOT
 
       - name: Run unit tests
         run: |
@@ -54,18 +56,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Clone ltgui
+      - name: Clone ltgui C++ library
         run: |
           git clone https://github.com/jiaheng0815/ltgui.git ../ltgui
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
       - name: Build ltgui C++ library
+        working-directory: ../ltgui
         run: |
-          cd ../ltgui
           python ltgui.py build
 
       - name: Build wheels
@@ -73,7 +70,7 @@ jobs:
         env:
           CIBW_BUILD: "cp38-* cp39-* cp310-* cp311-* cp312-* cp313-* cp314-*"
           CIBW_SKIP: "*-musllinux* *-win32"
-          CIBW_BEFORE_BUILD: "pip install pybind11 ninja"
+          CIBW_BEFORE_BUILD: "pip install pybind11 ninja pytest"
           CIBW_ENVIRONMENT: "LTGUI_ROOT=${{ github.workspace }}/../ltgui"
           CIBW_TEST_COMMAND: "pytest {project}/tests -v"
           CIBW_TEST_REQUIRES: "pytest"
