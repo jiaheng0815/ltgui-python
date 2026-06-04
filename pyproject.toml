@@ -1,0 +1,9 @@
+[build-system]
+requires = ["pybind11>=3.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ltgui"
+version = "0.1.0"
+description = "Python bindings for ltgui — cross-platform retained-mode GUI framework"
+requires-python = ">=3.8"

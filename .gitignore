@@ -1,0 +1,7 @@
+build/
+*.pyd
+*.dll
+__pycache__/
+*.pyc
+.cmake/
+font/Deng.ttf
